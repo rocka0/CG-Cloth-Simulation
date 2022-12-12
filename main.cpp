@@ -10,46 +10,42 @@
 
 using namespace std;
 
-constexpr int WIDTH = 1440;                      // Width of the window
-constexpr int HEIGHT = 900;                      // Height of the window
-constexpr int N = 13;                            // Number of points per row/col of cloth mesh: [0, N]
-constexpr int pointCount = (N + 1) * (N + 1);    // Total number of points in the grid
-constexpr float pointSpacing = 0.25f;            // Gap between two consecutive points of row/col in cloth mesh
-constexpr int fixedPointOne = N * (N + 1);
-constexpr int fixedPointTwo = pointCount - 1;
-constexpr float mass = 0.5f;                   // Mass of each cloth point
-glm::vec3 gravity(0.0f, -0.00981f, 0.0f);      // Gravity force vector in International System of Units
-constexpr float DEFAULT_DAMPING = -0.0125f;    // Velocity damping of point
-/*
-    Ks = Spring constant in Hooke's law: F = (-Ks)(x)
-    Kd = Spring damping constant: F = (-Kd)(v)
-    {A damping force is required for realistic numerical simulation to ensure the springs do not oscillate forever}
-*/
-constexpr float KsStruct = 0.5f, KdStruct = -0.25f;
-constexpr float KsShear = 0.5f, KdShear = -0.25f;
-constexpr float KsBend = 0.85f, KdBend = -0.25f;
+constexpr int WIDTH = 1440;                      ///< Width of the window
+constexpr int HEIGHT = 900;                      ///< Height of the window
+constexpr int N = 13;                            ///< Number of points per row/col of cloth mesh: [0, N]
+constexpr int pointCount = (N + 1) * (N + 1);    ///< Total number of points in the grid
+constexpr float pointSpacing = 0.25f;            ///< Gap between two consecutive points of row/col in cloth mesh
+constexpr int fixedPointOne = N * (N + 1);       ///< Stationary point
+constexpr int fixedPointTwo = pointCount - 1;    ///< Stationary point
+constexpr float mass = 0.5f;                     ///< Mass of each cloth point
+glm::vec3 gravity(0.0f, -0.00981f, 0.0f);        ///< Gravity force vector in International System of Units
+constexpr float DEFAULT_DAMPING = -0.0125f;      ///< Velocity damping of point
 
-constexpr float timeStep = 1 / 60.0f;    // dt time interval to update particle parameters
-double accumulator = 0.0f;               // Stores sum of time intervals until next dt time has elapsed
-LARGE_INTEGER frequency, t1, t2;         // t1, t2 store high accuracy time between 2 frames: t1 < t2
+constexpr float KsStruct = 0.5f, KdStruct = -0.25f;    ///< Constants for structural spring
+constexpr float KsShear = 0.5f, KdShear = -0.25f;      ///< Constant for shear spring
+constexpr float KsBend = 0.85f, KdBend = -0.25f;       ///< Constant for bend spring
 
-constexpr int GRID_SIZE = 8;    // reference grid size
-constexpr float GRID_DEPTH = -3;
+constexpr float timeStep = 1 / 60.0f;    ///< dt time interval to update particle parameters
+double accumulator = 0.0f;               ///< Stores sum of time intervals until next dt time has elapsed
+LARGE_INTEGER frequency, t1, t2;         ///< t1, t2 store high accuracy time between 2 frames: t1 < t2
 
-bool showPoints = true;               // flag which marks if point of cloth are shown or not
-bool showStructuralSprings = true;    // flag to show structuralSprings
-bool showShearSprings = false;        // flag to show shearSprings
-bool showBendSprings = false;         // flag to show bendSprings
-int mouseSelectedIndex = -1;          // if != -1, stores index of mouse selected point
+constexpr int GRID_SIZE = 8;        ///< reference grid size
+constexpr float GRID_DEPTH = -3;    ///< how far down is the grid w/r/t origin
+
+bool showPoints = true;               ///< flag which marks if point of cloth are shown or not
+bool showStructuralSprings = true;    ///< flag to show structuralSprings
+bool showShearSprings = false;        ///< flag to show shearSprings
+bool showBendSprings = false;         ///< flag to show bendSprings
+int mouseSelectedIndex = -1;          ///< if != -1, stores index of mouse selected point
 
 int prevX = 0;    // TODO
 int prevY = 0;    // TODO
 
-float rX = 30;    // stores the rotation angle along X for rotating scene
-float rY = 0;     // stores the rotation angle along Y for rotating scene
+float rX = 30;    ///< stores the rotation angle along X for rotating scene
+float rY = 0;     ///< stores the rotation angle along Y for rotating scene
 
-bool state = 1;      // tells us if we are zooming or rotating
-float dist = -15;    // stores zoom distance
+bool state = 1;      ///< tells us if we are zooming or rotating
+float dist = -15;    ///< stores zoom distance
 
 GLint viewport[4];        // TODO
 GLdouble MV[16];          // TODO
@@ -68,9 +64,9 @@ struct Point {
     bool isFixedPoint = false;
 };
 
-vector<Point> points;    // Array that stores all the points of the cloth
+vector<Point> points;    ///< Array that stores all the points of the cloth
 
-enum SPRING_TYPE { STRUCTURAL, SHEAR, BEND };    // Enum to store the various types of springs in the cloth
+enum SPRING_TYPE { STRUCTURAL, SHEAR, BEND };    ///< Enum to store the various types of springs in the cloth
 
 /*
     TODO
@@ -92,7 +88,7 @@ struct Spring {
     }
 };
 
-vector<Spring> springs;    // Array that stores all the springs in the cloth
+vector<Spring> springs;    ///< Array that stores all the springs in the cloth
 
 /*
     TODO: Setup routine.
@@ -260,14 +256,14 @@ void computeForces() {
         auto &F = p.force;
         F = glm::vec3(0);
 
-        // add gravity force only for non-fixed points
-        if (!p.isFixedPoint) F += gravity;
+        if (!p.isFixedPoint) F += gravity;    ///< add gravity force only for non-fixed points
 
-        // add force due to damping of velocity
-        F += DEFAULT_DAMPING * V;
+        F += DEFAULT_DAMPING * V;    ///< add force due to damping of velocity
     }
 
-    // add spring forces
+    /// <summary>
+    /// Add spring forces
+    /// </summary>
     for (auto &s : springs) {
         auto &P1 = s.p1.pos;
         auto &V1 = s.p1.velocity;
