@@ -13,64 +13,68 @@ using namespace std;
 constexpr int WIDTH = 1440;    // Width of the window
 constexpr int HEIGHT = 900;    // Height of the window
 
-constexpr int N = 7;                             // Number of points per row/col of cloth grid: [0, N]
+constexpr int N = 19;                            // Number of points per row/col of cloth grid: [0, N]
 constexpr int pointCount = (N + 1) * (N + 1);    // Total number of points in the grid
 
 constexpr float fullsize = 6.0;    // intial zoom in on cloth
 constexpr float halfsize = fullsize / 2;
 
-constexpr int GRID_SIZE = 8;    // bottom grid size
-
-constexpr float timeStep = 1 / 30.0f;
-float currentTime = 0;
-double accumulator = timeStep;
-
-int mouseSelectedIndex = -1;
-bool showPoints = true;
-bool showStructuralSprings = true;
-bool showShearSprings = false;
-bool showBendSprings = false;
-
-int oldX = 0, oldY = 0;
-float rX = 15, rY = 0;
-int state = 1;
-float dist = -23;
-
-constexpr float DEFAULT_DAMPING = -0.0125f;
+constexpr float mass = 0.2f;                   // mass of each cloth point
+glm::vec3 gravity(0.0f, -0.00981f, 0.0f);      // gravity force vector in International System of Units
+constexpr float DEFAULT_DAMPING = -0.0125f;    // velocity damping of point
+/*
+    Ks = Spring constant in Hooke's law: F = (-Ks)(x)
+    Kd = Spring damping constant: F = (-Kd)(v)
+    {A damping force is required for realistic numerical simulation to ensure the springs do not oscillate forever}
+*/
 constexpr float KsStruct = 0.5f, KdStruct = -0.25f;
 constexpr float KsShear = 0.5f, KdShear = -0.25f;
 constexpr float KsBend = 0.85f, KdBend = -0.25f;
-glm::vec3 gravity = glm::vec3(0.0f, -0.00981f, 0.0f);
-constexpr float mass = 0.5f;
 
-GLint viewport[4];
-GLdouble MV[16];
-GLdouble P[16];
+constexpr int GRID_SIZE = 8;    // reference grid size
 
-glm::vec3 Up = glm::vec3(0, 1, 0), Right, viewDir;
+constexpr float timeStep = 1 / 60.0f;    // dt time interval to update particle parameters
+double accumulator = timeStep;           // collects time intervals as frames are rendered
+LARGE_INTEGER frequency, t1, t2;         // t1, t2 store high accuracy time between 2 frames: t1 < t2
 
-LARGE_INTEGER frequency, t1, t2;
-double frameTimeQP = 0;
-float frameTime = 0;
+bool showPoints = true;               // flag which marks if point of cloth are shown or not
+bool showStructuralSprings = true;    // flag to show structuralSprings
+bool showShearSprings = false;        // flag to show shearSprings
+bool showBendSprings = false;         // flag to show bendSprings
+int mouseSelectedIndex = -1;          // if != -1, stores index of mouse selected point
 
-float startTime = 0, fps = 0;
-int totalFrames = 0;
+int prevX = 0;    // TODO
+int prevY = 0;    // TODO
 
+float rX = 45;    // stores the rotation angle along X for panning
+float rY = 0;     // stores the rotation angle along Y for panning
+
+bool state = 1;      // tells us if we are zooming or panning
+float dist = -30;    // stores distance to scene
+
+GLint viewport[4];        // TODO
+GLdouble MV[16];          // TODO
+GLdouble P[16];           // TODO
+glm::vec3 Up(0, 1, 0);    // TODO
+glm::vec3 Right;          // TODO
+glm::vec3 viewDir;        // TODO
+
+/*
+    TODO
+*/
 struct Point {
     glm::vec3 pos;
-    glm::vec3 prevPos;
     glm::vec3 velocity;
     glm::vec3 force;
-
-    void print() {
-        printf("Point: (%f, %f, %f)\n", pos.x, pos.y, pos.z);
-    }
 };
 
-vector<Point> points;
+vector<Point> points;    // Array that stores all the points of the cloth
 
-enum SPRING_TYPE { STRUCTURAL, SHEAR, BEND };
+enum SPRING_TYPE { STRUCTURAL, SHEAR, BEND };    // Enum to store the various types of springs in the cloth
 
+/*
+    TODO
+*/
 struct Spring {
     int p1;
     int p2;
@@ -90,11 +94,14 @@ struct Spring {
     }
 };
 
-vector<Spring> springs;
+vector<Spring> springs;    // Array that stores all the springs in the cloth
 
-void InitGL() {
-    startTime = (float) glutGet(GLUT_ELAPSED_TIME);
-    currentTime = startTime;
+/*
+    TODO: Setup routine.
+*/
+void initGL() {
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&t1);
     glEnable(GL_DEPTH_TEST);
 
     int n = N + 1;
@@ -108,57 +115,55 @@ void InitGL() {
         }
     }
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glPointSize(5);
-
-    wglSwapIntervalEXT(0);
-
     // setup springs
     // Horizontal
-    for (int l1 = 0; l1 < n; l1++)
-        for (int l2 = 0; l2 < (n - 1); l2++) {
-            springs.push_back(Spring((l1 * n) + l2, (l1 * n) + l2 + 1, KsStruct, KdStruct, STRUCTURAL));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < (n - 1); j++) {
+            springs.push_back(Spring((i * n) + j, (i * n) + j + 1, KsStruct, KdStruct, STRUCTURAL));
         }
 
     // Vertical
-    for (int l1 = 0; l1 < n; l1++)
-        for (int l2 = 0; l2 < (n - 1); l2++) {
-            springs.push_back(Spring((l2 * n) + l1, ((l2 + 1) * n) + l1, KsStruct, KdStruct, STRUCTURAL));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < (n - 1); j++) {
+            springs.push_back(Spring((j * n) + i, ((j + 1) * n) + i, KsStruct, KdStruct, STRUCTURAL));
         }
 
     // Shearing Springs
-    for (int l1 = 0; l1 < (n - 1); l1++) {
-        for (int l2 = 0; l2 < (n - 1); l2++) {
-            springs.push_back(Spring((l1 * n) + l2, ((l1 + 1) * n) + l2 + 1, KsShear, KdShear, SHEAR));
-            springs.push_back(Spring(((l1 + 1) * n) + l2, (l1 * n) + l2 + 1, KsShear, KdShear, SHEAR));
+    for (int i = 0; i < (n - 1); i++) {
+        for (int j = 0; j < (n - 1); j++) {
+            springs.push_back(Spring((i * n) + j, ((i + 1) * n) + j + 1, KsShear, KdShear, SHEAR));
+            springs.push_back(Spring(((i + 1) * n) + j, (i * n) + j + 1, KsShear, KdShear, SHEAR));
         }
     }
 
     // Bend Springs
-    for (int l1 = 0; l1 < n; l1++) {
-        for (int l2 = 0; l2 < (n - 2); l2++) {
-            springs.push_back(Spring((l1 * n) + l2, (l1 * n) + l2 + 2, KsBend, KdBend, BEND));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < (n - 2); j++) {
+            springs.push_back(Spring((i * n) + j, (i * n) + j + 2, KsBend, KdBend, BEND));
         }
-        springs.push_back(Spring((l1 * n) + (n - 3), (l1 * n) + (n - 1), KsBend, KdBend, BEND));
+        springs.push_back(Spring((i * n) + (n - 3), (i * n) + (n - 1), KsBend, KdBend, BEND));
     }
 
-    for (int l1 = 0; l1 < n; l1++) {
-        for (int l2 = 0; l2 < (n - 2); l2++) {
-            springs.push_back(Spring((l2 * n) + l1, ((l2 + 2) * n) + l1, KsBend, KdBend, BEND));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < (n - 2); j++) {
+            springs.push_back(Spring((j * n) + i, ((j + 2) * n) + i, KsBend, KdBend, BEND));
         }
-        springs.push_back(Spring(((n - 3) * n) + l1, ((n - 1) * n) + l1, KsBend, KdBend, BEND));
+        springs.push_back(Spring(((n - 3) * n) + i, ((n - 1) * n) + i, KsBend, KdBend, BEND));
     }
+
+    glPointSize(4);
+    wglSwapIntervalEXT(0);
 }
 
-// Drawing Routine.
+/*
+    TODO: Drawing Routine.
+*/
 void drawScene() {
-    float newTime = (float) glutGet(GLUT_ELAPSED_TIME);
-    frameTime = newTime - currentTime;
-    currentTime = newTime;
     QueryPerformanceCounter(&t2);
-    frameTimeQP = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
+    double frameTimeQP = (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
     t1 = t2;
     accumulator += frameTimeQP;
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     glTranslatef(0, 0, dist);
@@ -188,9 +193,9 @@ void drawScene() {
         for (int i = 0; (int) i < pointCount; i++) {
             auto &P = points[i].pos;
             if (i == mouseSelectedIndex) {
-                glColor3f(1.0f, 0.0f, 0.0f);
-            } else {
                 glColor3f(1.0f, 1.0f, 1.0f);
+            } else {
+                glColor3f(1.0f, 0.0f, 0.0f);
             }
             glVertex3f(P.x, P.y, P.z);
         }
@@ -203,7 +208,7 @@ void drawScene() {
         auto &p1 = points[s.p1].pos;
         auto &p2 = points[s.p2].pos;
         if (s.type == STRUCTURAL and showStructuralSprings) {
-            glColor3f(192 / 255.0f, 238 / 255.0f, 228 / 255.0f);
+            glColor3f(0.0f, 1.0f, 0.0f);
             glVertex3f(p1.x, p1.y, p1.z);
             glVertex3f(p2.x, p2.y, p2.z);
         }
@@ -223,7 +228,10 @@ void drawScene() {
     glutSwapBuffers();
 }
 
-void ComputeForces() {
+/*
+    TODO
+*/
+void computeForces() {
     for (int i = 0; i < pointCount; i++) {
         auto &V = points[i].velocity;
         auto &F = points[i].force;
@@ -258,21 +266,23 @@ void ComputeForces() {
     }
 }
 
-void IntegrateEuler() {
-    float deltaTimeMass = timeStep / mass;
-    for (int i = 0; i < pointCount; i++) {
-        auto &P = points[i].pos;
-        auto &V = points[i].velocity;
-        auto &F = points[i].force;
-        glm::vec3 oldV = V;
-        V += (F * deltaTimeMass);
-        P += timeStep * oldV;
-        if (P.y < 0) {
-            P.y = 0;
-        }
+/*
+    TODO
+*/
+void eulerIntegrate() {
+    for (auto &p : points) {
+        auto &P = p.pos;
+        auto &V = p.velocity;
+        auto &F = p.force;
+        P += V * timeStep;
+        V += (F * timeStep) / mass;
+        P.y = max(P.y, 0.0f);
     }
 }
 
+/*
+    TODO
+*/
 void ApplyProvotDynamicInverse() {
     for (size_t i = 0; i < springs.size(); i++) {
         auto &P1 = points[springs[i].p1].pos;
@@ -298,33 +308,41 @@ void ApplyProvotDynamicInverse() {
     }
 }
 
+/*
+    TODO:
+*/
 void OnIdle() {
     if (accumulator >= timeStep) {
         accumulator -= timeStep;
-        ComputeForces();
-        IntegrateEuler();
+        computeForces();
+        eulerIntegrate();
         ApplyProvotDynamicInverse();
     }
     glutPostRedisplay();
 }
 
-// OpenGL window reshape routine.
+/*
+    TODO: OpenGL window reshape routine.
+*/
 void resize(int w, int h) {
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, (GLfloat) w / (GLfloat) h, 1.0f, 150.0f);
+    gluPerspective(60, (GLfloat) w / (GLfloat) h, 1.0f, 100.0f);
     glGetIntegerv(GL_VIEWPORT, viewport);
     glGetDoublev(GL_PROJECTION_MATRIX, P);
     glMatrixMode(GL_MODELVIEW);
 }
 
-void OnMouseDown(int button, int s, int x, int y) {
+/*
+    TODO: Mouse Click Handler
+*/
+void mouseDownHandler(int button, int s, int x, int y) {
     if (s == GLUT_DOWN) {
-        oldX = x;
-        oldY = y;
+        prevX = x;
+        prevY = y;
         int window_y = (HEIGHT - y);
-        float norm_y = float(window_y) / float(HEIGHT / 2.0);
+        float norm_y = float((HEIGHT - y)) / float(HEIGHT / 2.0);
         int window_x = x;
         float norm_x = float(x) / float(WIDTH / 2.0);
         float winZ = 0;
@@ -337,36 +355,35 @@ void OnMouseDown(int button, int s, int x, int y) {
             auto &P = points[i].pos;
             if (glm::distance(P, pt) < 0.2) {
                 mouseSelectedIndex = i;
-                printf("Intersected at %d\t", i);
-                points[i].print();
+                printf("Intersected at point: (%f, %f, %f)\n", P.x, P.y, P.z);
                 break;
             }
         }
-    }
-
-    if (button == GLUT_RIGHT_BUTTON)
-        state = 0;
-    else
-        state = 1;
-
-    if (s == GLUT_UP) {
+        if (button == GLUT_RIGHT_BUTTON)
+            state = 0;
+        else
+            state = 1;
+    } else if (s == GLUT_UP) {
         mouseSelectedIndex = -1;
         glutSetCursor(GLUT_CURSOR_INHERIT);
     }
 }
 
-void OnMouseMove(int x, int y) {
+/*
+    TODO: Mouse Drag Handler
+*/
+void mouseMoveHandler(int x, int y) {
     if (mouseSelectedIndex == -1) {
         if (state == 0)
-            dist *= (1 + (y - oldY) / 60.0f);
+            dist *= (1 + (y - prevY) / 60.0f);
         else {
-            rY += (x - oldX) / 5.0f;
-            rX += (y - oldY) / 5.0f;
+            rY += (x - prevX) / 5.0f;
+            rX += (y - prevY) / 5.0f;
         }
     } else {
         float delta = 1500 / abs(dist);
-        float valX = (x - oldX) / delta;
-        float valY = (oldY - y) / delta;
+        float valX = (x - prevX) / delta;
+        float valY = (prevY - y) / delta;
         if (abs(valX) > abs(valY))
             glutSetCursor(GLUT_CURSOR_LEFT_RIGHT);
         else
@@ -379,12 +396,15 @@ void OnMouseMove(int x, int y) {
         if (newValue > 0) P.y = newValue;
         P.z += Right[2] * valX + Up[2] * valY;
     }
-    oldX = x;
-    oldY = y;
+    prevX = x;
+    prevY = y;
     glutPostRedisplay();
 }
 
-void keyPress(unsigned char key, int x, int y) {
+/*
+    TODO: keyDownHandler handler
+*/
+void keyDownHandler(unsigned char key, int x, int y) {
     switch (key) {
         case 'p': {
             showPoints ^= 1;
@@ -408,6 +428,9 @@ void keyPress(unsigned char key, int x, int y) {
     }
 }
 
+/*
+    TODO
+*/
 void printInfo() {
     printf("Press p to show/hide cloth points.\n");
     printf("Press s to show/hide STRUCTURAL springs.\n");
@@ -427,12 +450,12 @@ int main(int argc, char **argv) {
     glutReshapeFunc(resize);
     glutIdleFunc(OnIdle);
 
-    glutKeyboardFunc(keyPress);
-    glutMouseFunc(OnMouseDown);
-    glutMotionFunc(OnMouseMove);
+    glutKeyboardFunc(keyDownHandler);
+    glutMouseFunc(mouseDownHandler);
+    glutMotionFunc(mouseMoveHandler);
 
     glewInit();
-    InitGL();
+    initGL();
 
     glutMainLoop();
 }
