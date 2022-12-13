@@ -103,7 +103,7 @@ Data Fields</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A spring struct. This struct is used to encapsulate the various springs connecting points in our cloth mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00079">79</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00081">81</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="adee4821fe00682f04826aa5df1e6702c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adee4821fe00682f04826aa5df1e6702c">&#9670;&nbsp;</a></span>Spring()</h2>
@@ -167,16 +167,16 @@ Data Fields</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00095">95</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
-<div class="fragment"><div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                                                                       : <a class="code" href="struct_spring.html#a4cdf054174ded1e176c36c3d973cc4fa">p1</a>(<a class="code" href="struct_spring.html#a4cdf054174ded1e176c36c3d973cc4fa">p1</a>), <a class="code" href="struct_spring.html#a1fc80091a806244eacb72f1497ec998c">p2</a>(<a class="code" href="struct_spring.html#a1fc80091a806244eacb72f1497ec998c">p2</a>) {</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        this-&gt;<a class="code" href="struct_spring.html#a4d20d0a6e7d1e180656a567c50614ad3">Ks</a> = <a class="code" href="struct_spring.html#a4d20d0a6e7d1e180656a567c50614ad3">Ks</a>;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        this-&gt;<a class="code" href="struct_spring.html#af2ac253d653e316cb33ba3ba75807cfc">Kd</a> = <a class="code" href="struct_spring.html#af2ac253d653e316cb33ba3ba75807cfc">Kd</a>;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        this-&gt;<a class="code" href="struct_spring.html#a59d2fbdcef89ec7582c7bceefa962e2f">type</a> = <a class="code" href="struct_spring.html#a59d2fbdcef89ec7582c7bceefa962e2f">type</a>;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        glm::vec3 diff = <a class="code" href="struct_spring.html#a4cdf054174ded1e176c36c3d973cc4fa">p1</a>.<a class="code" href="struct_point.html#a3afd1095b26cf1f8c2c63a31dc7f6e04">pos</a> - <a class="code" href="struct_spring.html#a1fc80091a806244eacb72f1497ec998c">p2</a>.<a class="code" href="struct_point.html#a3afd1095b26cf1f8c2c63a31dc7f6e04">pos</a>;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        this-&gt;<a class="code" href="struct_spring.html#a7fd5dc95cc10192c3c459ddc38c8fcda">restLength</a> = sqrt(glm::dot(diff, diff));</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    }</div>
+<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00097">97</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
+<div class="fragment"><div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                                                                       : <a class="code" href="struct_spring.html#a4cdf054174ded1e176c36c3d973cc4fa">p1</a>(<a class="code" href="struct_spring.html#a4cdf054174ded1e176c36c3d973cc4fa">p1</a>), <a class="code" href="struct_spring.html#a1fc80091a806244eacb72f1497ec998c">p2</a>(<a class="code" href="struct_spring.html#a1fc80091a806244eacb72f1497ec998c">p2</a>) {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        this-&gt;<a class="code" href="struct_spring.html#a4d20d0a6e7d1e180656a567c50614ad3">Ks</a> = <a class="code" href="struct_spring.html#a4d20d0a6e7d1e180656a567c50614ad3">Ks</a>;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        this-&gt;<a class="code" href="struct_spring.html#af2ac253d653e316cb33ba3ba75807cfc">Kd</a> = <a class="code" href="struct_spring.html#af2ac253d653e316cb33ba3ba75807cfc">Kd</a>;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        this-&gt;<a class="code" href="struct_spring.html#a59d2fbdcef89ec7582c7bceefa962e2f">type</a> = <a class="code" href="struct_spring.html#a59d2fbdcef89ec7582c7bceefa962e2f">type</a>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        glm::vec3 diff = <a class="code" href="struct_spring.html#a4cdf054174ded1e176c36c3d973cc4fa">p1</a>.<a class="code" href="struct_point.html#a3afd1095b26cf1f8c2c63a31dc7f6e04">pos</a> - <a class="code" href="struct_spring.html#a1fc80091a806244eacb72f1497ec998c">p2</a>.<a class="code" href="struct_point.html#a3afd1095b26cf1f8c2c63a31dc7f6e04">pos</a>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        this-&gt;<a class="code" href="struct_spring.html#a7fd5dc95cc10192c3c459ddc38c8fcda">restLength</a> = sqrt(glm::dot(diff, diff));</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    }</div>
 </div><!-- fragment -->
-<p class="reference">References <a class="el" href="main_8cpp_source.html#l00061">Point::pos</a>.</p>
+<p class="reference">References <a class="el" href="main_8cpp_source.html#l00063">Point::pos</a>.</p>
 
 </div>
 </div>
@@ -195,7 +195,7 @@ Data Fields</h2></td></tr>
 
 <p>Damping constant for spring motion: F = -Kd * v. </p>
 
-<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00084">84</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00086">86</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
 
 </div>
 </div>
@@ -213,7 +213,7 @@ Data Fields</h2></td></tr>
 
 <p><a class="el" href="struct_spring.html">Spring</a> constant as per Hooke's law: F = -Ks * x. </p>
 
-<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00083">83</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00085">85</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
 
 </div>
 </div>
@@ -231,7 +231,7 @@ Data Fields</h2></td></tr>
 
 <p>reference to first endpoint of our spring </p>
 
-<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00080">80</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00082">82</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
 
 </div>
 </div>
@@ -249,7 +249,7 @@ Data Fields</h2></td></tr>
 
 <p>reference to second endpoint of our spring </p>
 
-<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00081">81</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00083">83</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
 
 </div>
 </div>
@@ -267,7 +267,7 @@ Data Fields</h2></td></tr>
 
 <p>stores the natural length of the spring </p>
 
-<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00082">82</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00084">84</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
 
 </div>
 </div>
@@ -285,7 +285,7 @@ Data Fields</h2></td></tr>
 
 <p>stores the type of the spring </p>
 
-<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00085">85</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="main_8cpp_source.html#l00087">87</a> of file <a class="el" href="main_8cpp_source.html">main.cpp</a>.</p>
 
 </div>
 </div>
@@ -293,16 +293,16 @@ Data Fields</h2></td></tr>
 <li><a class="el" href="main_8cpp_source.html">main.cpp</a></li>
 </ul>
 </div><!-- contents -->
-<div class="ttc" id="astruct_spring_html_a1fc80091a806244eacb72f1497ec998c"><div class="ttname"><a href="struct_spring.html#a1fc80091a806244eacb72f1497ec998c">Spring::p2</a></div><div class="ttdeci">Point &amp; p2</div><div class="ttdoc">reference to second endpoint of our spring</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00081">main.cpp:81</a></div></div>
-<div class="ttc" id="astruct_spring_html_a4d20d0a6e7d1e180656a567c50614ad3"><div class="ttname"><a href="struct_spring.html#a4d20d0a6e7d1e180656a567c50614ad3">Spring::Ks</a></div><div class="ttdeci">float Ks</div><div class="ttdoc">Spring constant as per Hooke's law: F = -Ks * x.</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00083">main.cpp:83</a></div></div>
-<div class="ttc" id="astruct_spring_html_a7fd5dc95cc10192c3c459ddc38c8fcda"><div class="ttname"><a href="struct_spring.html#a7fd5dc95cc10192c3c459ddc38c8fcda">Spring::restLength</a></div><div class="ttdeci">float restLength</div><div class="ttdoc">stores the natural length of the spring</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00082">main.cpp:82</a></div></div>
-<div class="ttc" id="astruct_spring_html_af2ac253d653e316cb33ba3ba75807cfc"><div class="ttname"><a href="struct_spring.html#af2ac253d653e316cb33ba3ba75807cfc">Spring::Kd</a></div><div class="ttdeci">float Kd</div><div class="ttdoc">Damping constant for spring motion: F = -Kd * v.</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00084">main.cpp:84</a></div></div>
-<div class="ttc" id="astruct_point_html_a3afd1095b26cf1f8c2c63a31dc7f6e04"><div class="ttname"><a href="struct_point.html#a3afd1095b26cf1f8c2c63a31dc7f6e04">Point::pos</a></div><div class="ttdeci">glm::vec3 pos</div><div class="ttdoc">stores the position vector of the point</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00061">main.cpp:61</a></div></div>
-<div class="ttc" id="astruct_spring_html_a4cdf054174ded1e176c36c3d973cc4fa"><div class="ttname"><a href="struct_spring.html#a4cdf054174ded1e176c36c3d973cc4fa">Spring::p1</a></div><div class="ttdeci">Point &amp; p1</div><div class="ttdoc">reference to first endpoint of our spring</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00080">main.cpp:80</a></div></div>
-<div class="ttc" id="astruct_spring_html_a59d2fbdcef89ec7582c7bceefa962e2f"><div class="ttname"><a href="struct_spring.html#a59d2fbdcef89ec7582c7bceefa962e2f">Spring::type</a></div><div class="ttdeci">SPRING_TYPE type</div><div class="ttdoc">stores the type of the spring</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00085">main.cpp:85</a></div></div>
+<div class="ttc" id="astruct_spring_html_a1fc80091a806244eacb72f1497ec998c"><div class="ttname"><a href="struct_spring.html#a1fc80091a806244eacb72f1497ec998c">Spring::p2</a></div><div class="ttdeci">Point &amp; p2</div><div class="ttdoc">reference to second endpoint of our spring</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00083">main.cpp:83</a></div></div>
+<div class="ttc" id="astruct_spring_html_a4d20d0a6e7d1e180656a567c50614ad3"><div class="ttname"><a href="struct_spring.html#a4d20d0a6e7d1e180656a567c50614ad3">Spring::Ks</a></div><div class="ttdeci">float Ks</div><div class="ttdoc">Spring constant as per Hooke's law: F = -Ks * x.</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00085">main.cpp:85</a></div></div>
+<div class="ttc" id="astruct_spring_html_a7fd5dc95cc10192c3c459ddc38c8fcda"><div class="ttname"><a href="struct_spring.html#a7fd5dc95cc10192c3c459ddc38c8fcda">Spring::restLength</a></div><div class="ttdeci">float restLength</div><div class="ttdoc">stores the natural length of the spring</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00084">main.cpp:84</a></div></div>
+<div class="ttc" id="astruct_spring_html_af2ac253d653e316cb33ba3ba75807cfc"><div class="ttname"><a href="struct_spring.html#af2ac253d653e316cb33ba3ba75807cfc">Spring::Kd</a></div><div class="ttdeci">float Kd</div><div class="ttdoc">Damping constant for spring motion: F = -Kd * v.</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00086">main.cpp:86</a></div></div>
+<div class="ttc" id="astruct_point_html_a3afd1095b26cf1f8c2c63a31dc7f6e04"><div class="ttname"><a href="struct_point.html#a3afd1095b26cf1f8c2c63a31dc7f6e04">Point::pos</a></div><div class="ttdeci">glm::vec3 pos</div><div class="ttdoc">stores the position vector of the point</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00063">main.cpp:63</a></div></div>
+<div class="ttc" id="astruct_spring_html_a4cdf054174ded1e176c36c3d973cc4fa"><div class="ttname"><a href="struct_spring.html#a4cdf054174ded1e176c36c3d973cc4fa">Spring::p1</a></div><div class="ttdeci">Point &amp; p1</div><div class="ttdoc">reference to first endpoint of our spring</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00082">main.cpp:82</a></div></div>
+<div class="ttc" id="astruct_spring_html_a59d2fbdcef89ec7582c7bceefa962e2f"><div class="ttname"><a href="struct_spring.html#a59d2fbdcef89ec7582c7bceefa962e2f">Spring::type</a></div><div class="ttdeci">SPRING_TYPE type</div><div class="ttdoc">stores the type of the spring</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00087">main.cpp:87</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Dec 13 2022 19:35:54 for Cloth Simulation by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 13 2022 22:06:28 for Cloth Simulation by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

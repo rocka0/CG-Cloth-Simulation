@@ -12,15 +12,15 @@ using namespace std;
 
 constexpr int WIDTH = 1440;                      ///< Width of the window
 constexpr int HEIGHT = 900;                      ///< Height of the window
-constexpr int N = 19;                            ///< Number of points per row/col of cloth mesh: [0, N]
+constexpr int N = 14;                            ///< Number of points per row/col of cloth mesh: [0, N]
 constexpr int pointCount = (N + 1) * (N + 1);    ///< Total number of points in the grid
 constexpr float pointSpacing = 0.25f;            ///< Gap between two consecutive points of row/col in cloth mesh
 constexpr int fixedPointOne = N * (N + 1);       ///< Stationary point
 constexpr int fixedPointTwo = pointCount - 1;    ///< Stationary point
 
-constexpr float mass = 0.1f;                     ///< Mass of each cloth point
-glm::vec3 gravity(0.0f, -0.00981f, 0.0f);        ///< Gravity force vector in International System of Units
-constexpr float DEFAULT_DAMPING = -0.0125f;      ///< Velocity damping of point
+constexpr float mass = 0.1f;                           ///< Mass of each cloth point
+glm::vec3 gravity(0.0f, -0.00981f, 0.0f);              ///< Gravity force vector in International System of Units
+constexpr float DEFAULT_DAMPING = -0.0125f;            ///< Velocity damping of point
 constexpr float KsStruct = 0.5f, KdStruct = -0.25f;    ///< Constants for structural spring
 constexpr float KsShear = 0.5f, KdShear = -0.25f;      ///< Constant for shear spring
 constexpr float KsBend = 0.85f, KdBend = -0.25f;       ///< Constant for bend spring
@@ -31,6 +31,8 @@ LARGE_INTEGER frequency, t1, t2;          ///< t1, t2 store high accuracy time b
 
 constexpr int GRID_SIZE = 8;        ///< reference grid size
 constexpr float GRID_DEPTH = -5;    ///< how far down is the grid w/r/t origin
+
+constexpr float selectThreshold = 0.2;    ///< radius within which a point is selected
 
 bool showPoints = true;               ///< flag which marks if point of cloth are shown or not
 bool showStructuralSprings = true;    ///< flag to show structuralSprings
@@ -396,7 +398,7 @@ void mouseDownHandler(int button, int s, int x, int y) {
         glm::vec3 pt(objX, objY, objZ);
         for (int i = 0; i < pointCount; i++) {
             auto &P = points[i].pos;
-            if (glm::distance(P, pt) < 0.2) {
+            if (glm::distance(P, pt) < selectThreshold) {
                 mouseSelectedIndex = i;
                 printf("Intersected at point: (%f, %f, %f)\n", P.x, P.y, P.z);
                 break;
@@ -424,7 +426,7 @@ void mouseMoveHandler(int x, int y) {
             rX += (y - prevY) / 5.0f;
         }
     } else {
-        float delta = 2000 / abs(dist);
+        float delta = 1500 / abs(dist);
         float valX = (x - prevX) / delta;
         float valY = (prevY - y) / delta;
         if (abs(valX) > abs(valY))

@@ -91,17 +91,46 @@ Implementation Detail</h1>
 <li><b>Shear springs:</b> Handle shear stresses and are connected diagonally.</li>
 <li><b>Bend springs:</b> Handle bending stresses and are connected vertically and horizontally to every other particle</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md2"></a>
+<p><img src="https://www.researchgate.net/profile/Min-Sang-Kim/publication/327513476/figure/fig1/AS:677014595981315@1538424266958/Three-types-of-basic-springs-for-cloth-simulation.png" alt="Cloth Simulation Springs" class="inline"/></p>
+<h3>Equations Involved</h3>
+<p>$$Force_{gravity}=Mass \times Acceleration_{gravity}$$ $$Acceleration_{gravity} = 9.8 \frac{m}{s^{2}}$$ $$Hooke's \ Law \coloneqq F \propto -\triangle x$$ $$Spring \ Damping \coloneqq F \propto -v$$</p>
+<h3>Computing Position Changes</h3>
+<p>To simulate the particle physics in our scene, we need to consider a finite $dt$ time interval and compute the changes in $position$, $velocity$, $acceleration$ and $force$ so that the next frame may use these updated values and the system moves ahead.</p>
+<p>$Force$ changes can be computed from the above equations.</p>
+<p>$Acceleration$ may be computed as $\frac{Force}{mass}$.</p>
+<p>For $velocity$, we need to use the kinematic equations:</p>
+<p>$$a(t) = \frac{d}{dt} v(t)$$</p>
+<p>or for shorthand</p>
+<p>$$a = \frac{dv}{dt} \implies dv = a \cdot dt$$</p>
+<p>Similarly, $$v = \frac{dx}{dt} \implies dx = v \cdot dt$$</p>
+<p>To compute the values of $dv$ and $dx$, we use the <b>Explicit Euler Integration Method</b> which tells us that:</p>
+<p>$$x(t+dt) = x + dx \implies x(t+dt) = x + v \times dt$$</p>
+<p>$$v(t+dt) = v + dv \implies v(t+dt) = v + a \times dt$$</p>
+<p>These equations allow us to recompute our values after $dt$ time interval has passed.</p>
+<h2><a class="anchor" id="autotoc_md2"></a>
+Outputs and Comments</h2>
+<p><img src="https://raw.githubusercontent.com/rocka0/CG-Cloth-Simulation/main/images/running1.png" alt="Only Shear Springs" class="inline"/></p>
+<p>This is a photo of our cloth simulation with just <b>shear springs</b></p>
+<p><img src="https://raw.githubusercontent.com/rocka0/CG-Cloth-Simulation/main/images/running2.png" alt="Shear and Bend" class="inline"/></p>
+<h2><a class="anchor" id="autotoc_md3"></a>
+The Jakobsen Constraint Relaxation</h2>
+<p>We noticed that the cloth appears to be far smoother than it should be and the reason for that was the incorrect management of constraints regarding the length of the springs.</p>
+<p><img src="https://raw.githubusercontent.com/rocka0/CG-Cloth-Simulation/main/images/withoutJakobsen.png" alt="Without Jakobsen" class="inline"/></p>
+<p>Notice that without applying the Jakobsen method, the cloth seems to sag far too much. This is because the cloth was originally having spring rest length of $1$ but after applying the particle dynamics, it shifted to $\gt 1$.</p>
+<p>Applying the Jakobsen method allows us to manage the constraints after the particle dynamics has kicked in, so that the mesh stays more or less intact. The resulting cloth is more accurate:</p>
+<p><img src="https://raw.githubusercontent.com/rocka0/CG-Cloth-Simulation/main/images/withJakobsen.png" alt="With Jakobsen" class="inline"/></p>
+<h1><a class="anchor" id="autotoc_md4"></a>
 References</h1>
 <ul>
-<li><a href="https://nccastaff.bournemouth.ac.uk/jmacey/OldWeb/MastersProjects/Msc05/cloth_simulation.pdf">https://nccastaff.bournemouth.ac.uk/jmacey/OldWeb/MastersProjects/Msc05/cloth_simulation.pdf</a></li>
-<li></li>
+<li>Cloth Simulation Book: <a href="https://nccastaff.bournemouth.ac.uk/jmacey/OldWeb/MastersProjects/Msc05/cloth_simulation.pdf">https://nccastaff.bournemouth.ac.uk/jmacey/OldWeb/MastersProjects/Msc05/cloth_simulation.pdf</a></li>
+<li><a href="https://owlree.blog/posts/simulating-a-rope.html">https://owlree.blog/posts/simulating-a-rope.html</a></li>
+<li>Jakobsen Method Paper: <a href="http://web.archive.org/web/20080912030612/http://teknikus.dk/tj/gdc2001.htm">http://web.archive.org/web/20080912030612/http://teknikus.dk/tj/gdc2001.htm</a> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Dec 13 2022 19:35:54 for Cloth Simulation by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Dec 13 2022 22:06:27 for Cloth Simulation by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>
