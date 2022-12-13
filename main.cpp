@@ -17,7 +17,7 @@ constexpr int pointCount = (N + 1) * (N + 1);    ///< Total number of points in 
 constexpr float pointSpacing = 0.25f;            ///< Gap between two consecutive points of row/col in cloth mesh
 constexpr int fixedPointOne = N * (N + 1);       ///< Stationary point
 constexpr int fixedPointTwo = pointCount - 1;    ///< Stationary point
-constexpr float mass = 0.5f;                     ///< Mass of each cloth point
+constexpr float mass = 0.1f;                     ///< Mass of each cloth point
 glm::vec3 gravity(0.0f, -0.00981f, 0.0f);        ///< Gravity force vector in International System of Units
 constexpr float DEFAULT_DAMPING = -0.0125f;      ///< Velocity damping of point
 
@@ -25,12 +25,12 @@ constexpr float KsStruct = 0.5f, KdStruct = -0.25f;    ///< Constants for struct
 constexpr float KsShear = 0.5f, KdShear = -0.25f;      ///< Constant for shear spring
 constexpr float KsBend = 0.85f, KdBend = -0.25f;       ///< Constant for bend spring
 
-constexpr float timeStep = 1 / 60.0f;    ///< dt time interval to update particle parameters
-double accumulator = 0.0f;               ///< Stores sum of time intervals until next dt time has elapsed
-LARGE_INTEGER frequency, t1, t2;         ///< t1, t2 store high accuracy time between 2 frames: t1 < t2
+constexpr float timeStep = 1 / 240.0f;    ///< dt time interval to update particle parameters
+double accumulator = 0.0f;                ///< Stores sum of time intervals until next dt time has elapsed
+LARGE_INTEGER frequency, t1, t2;          ///< t1, t2 store high accuracy time between 2 frames: t1 < t2
 
 constexpr int GRID_SIZE = 8;        ///< reference grid size
-constexpr float GRID_DEPTH = -3;    ///< how far down is the grid w/r/t origin
+constexpr float GRID_DEPTH = -5;    ///< how far down is the grid w/r/t origin
 
 bool showPoints = true;               ///< flag which marks if point of cloth are shown or not
 bool showStructuralSprings = true;    ///< flag to show structuralSprings
@@ -45,14 +45,14 @@ float rX = 30;    ///< stores the rotation angle along X for rotating scene
 float rY = 0;     ///< stores the rotation angle along Y for rotating scene
 
 bool state = 1;      ///< tells us if we are zooming or rotating
-float dist = -15;    ///< stores zoom distance
+float dist = -25;    ///< stores zoom distance
 
-GLint viewport[4];        // TODO
+GLint viewport[4];        ///< Used to set the viewport
 GLdouble MV[16];          // TODO
 GLdouble P[16];           // TODO
-glm::vec3 Up(0, 1, 0);    // TODO
-glm::vec3 Right;          // TODO
-glm::vec3 viewDir;        // TODO
+glm::vec3 Up(0, 1, 0);    // Up vector of the camera
+glm::vec3 Right;          // Right vector on the projection plane
+glm::vec3 viewDir;        // Viewing direction vector
 
 /**
  *  A point struct. This struct is used to encapsulate the points of the cloth
@@ -192,6 +192,11 @@ void initGL() {
         }
     }
 
+    ///< Setup the grid to fall by default
+    for (auto &p : points) {
+        swap(p.pos.z, p.pos.y);
+    }
+
     glPointSize(4);
     wglSwapIntervalEXT(0);
 }
@@ -318,15 +323,16 @@ void eulerIntegrate() {
 }
 
 /**
- * TODO
+ * Function that uses the Jakobsen method to enforce positional constraints
+ * https://owlree.blog/posts/simulating-a-rope.html, section 1.2.5
  */
-void ApplyProvotDynamicInverse() {
+void applyJakobsen() {
     for (auto &s : springs) {
         auto &P1 = s.p1.pos;
         auto &V1 = s.p1.velocity;
         auto &P2 = s.p2.pos;
         auto &V2 = s.p2.velocity;
-        glm::vec3 deltaP = P1 - P2;
+        glm::vec3 deltaP = P2 - P1;
         float dist = glm::length(deltaP);
         if (dist > s.restLength) {
             dist -= (s.restLength);
@@ -334,12 +340,12 @@ void ApplyProvotDynamicInverse() {
             deltaP = glm::normalize(deltaP);
             deltaP *= dist;
             if (s.p1.isFixedPoint) {
-                V2 += deltaP;
+                V2 -= deltaP;
             } else if (s.p2.isFixedPoint) {
-                V1 -= deltaP;
+                V1 += deltaP;
             } else {
-                V1 -= deltaP;
-                V2 += deltaP;
+                V2 -= deltaP;
+                V1 += deltaP;
             }
         }
     }
@@ -353,7 +359,7 @@ void OnIdle() {
         accumulator -= timeStep;
         computeForces();
         eulerIntegrate();
-        ApplyProvotDynamicInverse();
+        applyJakobsen();
     }
     glutPostRedisplay();
 }
@@ -418,7 +424,7 @@ void mouseMoveHandler(int x, int y) {
             rX += (y - prevY) / 5.0f;
         }
     } else {
-        float delta = 1500 / abs(dist);
+        float delta = 2000 / abs(dist);
         float valX = (x - prevX) / delta;
         float valY = (prevY - y) / delta;
         if (abs(valX) > abs(valY))
@@ -429,8 +435,7 @@ void mouseMoveHandler(int x, int y) {
         auto &V = points[mouseSelectedIndex].velocity;
         V = glm::vec3(0);
         P.x += Right[0] * valX;
-        float newValue = P.y + Up[1] * valY;
-        if (newValue > 0) P.y = newValue;
+        P.y = P.y + Up[1] * valY;
         P.z += Right[2] * valX + Up[2] * valY;
     }
     prevX = x;
