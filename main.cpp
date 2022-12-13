@@ -38,8 +38,8 @@ bool showShearSprings = false;        ///< flag to show shearSprings
 bool showBendSprings = false;         ///< flag to show bendSprings
 int mouseSelectedIndex = -1;          ///< if != -1, stores index of mouse selected point
 
-int prevX = 0;    // TODO
-int prevY = 0;    // TODO
+int prevX = 0;    ///<   Stores previous X coordinate of mouse, used for zooming and rotating the scene
+int prevY = 0;    ///< Stores previous Y coordinate of mouse, used for zooming and rotating the scene
 
 float rX = 30;    ///< stores the rotation angle along X for rotating scene
 float rY = 0;     ///< stores the rotation angle along Y for rotating scene
@@ -54,31 +54,42 @@ glm::vec3 Up(0, 1, 0);    // TODO
 glm::vec3 Right;          // TODO
 glm::vec3 viewDir;        // TODO
 
-/*
-    TODO
-*/
+/**
+ *  A point struct. This struct is used to encapsulate the points of the cloth
+ */
 struct Point {
-    glm::vec3 pos;
-    glm::vec3 velocity;
-    glm::vec3 force;
-    bool isFixedPoint = false;
+    glm::vec3 pos;                ///< stores the position vector of the point
+    glm::vec3 velocity;           ///< stores the velocity vector of the point
+    glm::vec3 force;              ///< stores the force vector of the point
+    bool isFixedPoint = false;    ///< flag that tells us if the point is invariant stationary or not
 };
 
 vector<Point> points;    ///< Array that stores all the points of the cloth
 
-enum SPRING_TYPE { STRUCTURAL, SHEAR, BEND };    ///< Enum to store the various types of springs in the cloth
+/**
+ * Spring-type enum.
+ * This enumeration stores the various types of springs in our cloth mesh
+ */
+enum SPRING_TYPE { STRUCTURAL, SHEAR, BEND };
 
-/*
-    TODO
-*/
+/**
+ * A spring struct. This struct is used to encapsulate the various springs
+ * connecting points in our cloth mesh.
+ */
 struct Spring {
-    Point &p1;
-    Point &p2;
-    float restLength;
-    float Ks;
-    float Kd;
-    SPRING_TYPE type;
+    Point &p1;           ///< reference to first endpoint of our spring
+    Point &p2;           ///< reference to second endpoint of our spring
+    float restLength;    ///< stores the natural length of the spring
+    float Ks;            ///< Spring constant as per Hooke's law: F = -Ks * x
+    float Kd;            ///< Damping constant for spring motion: F = -Kd * v
+    SPRING_TYPE type;    ///< stores the type of the spring
 
+    /**
+     * a normal member taking two arguments and returning an integer value.
+     * @param a an integer argument.
+     * @param s a constant character pointer.
+     * @return The test results
+     */
     Spring(Point &p1, Point &p2, SPRING_TYPE type, float Ks, float Kd) : p1(p1), p2(p2) {
         this->Ks = Ks;
         this->Kd = Kd;
