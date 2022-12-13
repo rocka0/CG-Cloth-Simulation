@@ -85,10 +85,12 @@ struct Spring {
     SPRING_TYPE type;    ///< stores the type of the spring
 
     /**
-     * a normal member taking two arguments and returning an integer value.
-     * @param a an integer argument.
-     * @param s a constant character pointer.
-     * @return The test results
+     * Constructor function for spring struct
+     * @param p1 Reference to end point 1
+     * @param p2 Reference to end point 2
+     * @param type Spring type
+     * @param Ks Spring constant
+     * @param Kd Damping constant
      */
     Spring(Point &p1, Point &p2, SPRING_TYPE type, float Ks, float Kd) : p1(p1), p2(p2) {
         this->Ks = Ks;
@@ -101,15 +103,21 @@ struct Spring {
 
 vector<Spring> springs;    ///< Array that stores all the springs in the cloth
 
-/*
-    TODO: Setup routine.
-*/
+/**
+ * Setup points and springs
+ */
 void initGL() {
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&t1);
     glEnable(GL_DEPTH_TEST);
 
-    auto rowMajor = [&](const int x, const int y) {
+    /**
+     * Converts 2D point coordinate into 1D row major index
+     * @param x X-Coordinate of point
+     * @param y Y-Coordinate of point
+     * @return Row Major index of (x,y)
+     */
+    auto rowMajor = [&](const int x, const int y) -> int {
         return (N + 1) * y + x;
     };
 
@@ -188,9 +196,9 @@ void initGL() {
     wglSwapIntervalEXT(0);
 }
 
-/*
-    TODO: Drawing Routine.
-*/
+/**
+ * Render function
+ */
 void drawScene() {
     QueryPerformanceCounter(&t2);
     accumulator += (t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart;
@@ -258,9 +266,9 @@ void drawScene() {
     glutSwapBuffers();
 }
 
-/*
-    TODO
-*/
+/**
+ * Function to recalculate the forces on every point
+ */
 void computeForces() {
     for (auto &p : points) {
         auto &V = p.velocity;
@@ -296,9 +304,9 @@ void computeForces() {
     }
 }
 
-/*
-    TODO
-*/
+/**
+ * Function to use Explicit Euler Integration to compute position and velocity changes
+ */
 void eulerIntegrate() {
     for (auto &p : points) {
         auto &P = p.pos;
@@ -309,9 +317,9 @@ void eulerIntegrate() {
     }
 }
 
-/*
-    TODO
-*/
+/**
+ * TODO
+ */
 void ApplyProvotDynamicInverse() {
     for (auto &s : springs) {
         auto &P1 = s.p1.pos;
@@ -337,9 +345,9 @@ void ApplyProvotDynamicInverse() {
     }
 }
 
-/*
-    TODO:
-*/
+/**
+ * Function called in between frame renders
+ */
 void OnIdle() {
     if (accumulator >= timeStep) {
         accumulator -= timeStep;
@@ -350,9 +358,9 @@ void OnIdle() {
     glutPostRedisplay();
 }
 
-/*
-    TODO: OpenGL window reshape routine.
-*/
+/**
+ * OpenGL window reshape routine.
+ */
 void resize(int w, int h) {
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
@@ -363,9 +371,9 @@ void resize(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
 }
 
-/*
-    TODO: Mouse Click Handler
-*/
+/**
+ * Mouse Click Handler
+ */
 void mouseDownHandler(int button, int s, int x, int y) {
     if (s == GLUT_DOWN) {
         prevX = x;
@@ -398,9 +406,9 @@ void mouseDownHandler(int button, int s, int x, int y) {
     }
 }
 
-/*
-    TODO: Mouse Drag Handler
-*/
+/**
+ * Mouse drag handler
+ */
 void mouseMoveHandler(int x, int y) {
     if (mouseSelectedIndex == -1) {
         if (state == 0)
@@ -430,9 +438,9 @@ void mouseMoveHandler(int x, int y) {
     glutPostRedisplay();
 }
 
-/*
-    TODO: keyDownHandler handler
-*/
+/**
+ * Key press handler
+ */
 void keyDownHandler(unsigned char key, int x, int y) {
     switch (key) {
         case 'p': {
@@ -457,9 +465,9 @@ void keyDownHandler(unsigned char key, int x, int y) {
     }
 }
 
-/*
-    TODO
-*/
+/**
+ * Print options to user
+ */
 void printInfo() {
     printf("Press p to show/hide cloth points.\n");
     printf("Press s to show/hide STRUCTURAL springs.\n");
