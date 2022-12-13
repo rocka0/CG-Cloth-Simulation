@@ -12,15 +12,15 @@ using namespace std;
 
 constexpr int WIDTH = 1440;                      ///< Width of the window
 constexpr int HEIGHT = 900;                      ///< Height of the window
-constexpr int N = 13;                            ///< Number of points per row/col of cloth mesh: [0, N]
+constexpr int N = 19;                            ///< Number of points per row/col of cloth mesh: [0, N]
 constexpr int pointCount = (N + 1) * (N + 1);    ///< Total number of points in the grid
 constexpr float pointSpacing = 0.25f;            ///< Gap between two consecutive points of row/col in cloth mesh
 constexpr int fixedPointOne = N * (N + 1);       ///< Stationary point
 constexpr int fixedPointTwo = pointCount - 1;    ///< Stationary point
+
 constexpr float mass = 0.1f;                     ///< Mass of each cloth point
 glm::vec3 gravity(0.0f, -0.00981f, 0.0f);        ///< Gravity force vector in International System of Units
 constexpr float DEFAULT_DAMPING = -0.0125f;      ///< Velocity damping of point
-
 constexpr float KsStruct = 0.5f, KdStruct = -0.25f;    ///< Constants for structural spring
 constexpr float KsShear = 0.5f, KdShear = -0.25f;      ///< Constant for shear spring
 constexpr float KsBend = 0.85f, KdBend = -0.25f;       ///< Constant for bend spring
@@ -48,11 +48,11 @@ bool state = 1;      ///< tells us if we are zooming or rotating
 float dist = -25;    ///< stores zoom distance
 
 GLint viewport[4];        ///< Used to set the viewport
-GLdouble MV[16];          // TODO
-GLdouble P[16];           // TODO
-glm::vec3 Up(0, 1, 0);    // Up vector of the camera
-glm::vec3 Right;          // Right vector on the projection plane
-glm::vec3 viewDir;        // Viewing direction vector
+GLdouble MV[16];          ///< Used to store the GL_MODELVIEW_MATRIX
+GLdouble P[16];           ///< Used to store the GL_PROJECTION_MATRIX
+glm::vec3 Up(0, 1, 0);    ///< Up vector of the camera
+glm::vec3 Right;          ///< Right vector on the projection plane
+glm::vec3 viewDir;        ///< Viewing direction vector
 
 /**
  *  A point struct. This struct is used to encapsulate the points of the cloth
