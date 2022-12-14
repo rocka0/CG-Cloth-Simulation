@@ -10,9 +10,9 @@
 
 using namespace std;
 
-constexpr int WIDTH = 1440;                      ///< Width of the window
-constexpr int HEIGHT = 900;                      ///< Height of the window
-constexpr int N = 14;                            ///< Number of points per row/col of cloth mesh: [0, N]
+ int WIDTH = 1440;                      ///< Width of the window
+ int HEIGHT = 900;                      ///< Height of the window
+constexpr int N = 15;                            ///< Number of points per row/col of cloth mesh: [0, N]
 constexpr int pointCount = (N + 1) * (N + 1);    ///< Total number of points in the grid
 constexpr float pointSpacing = 0.25f;            ///< Gap between two consecutive points of row/col in cloth mesh
 constexpr int fixedPointOne = N * (N + 1);       ///< Stationary point
@@ -32,7 +32,7 @@ LARGE_INTEGER frequency, t1, t2;          ///< t1, t2 store high accuracy time b
 constexpr int GRID_SIZE = 8;        ///< reference grid size
 constexpr float GRID_DEPTH = -5;    ///< how far down is the grid w/r/t origin
 
-constexpr float selectThreshold = 0.2;    ///< radius within which a point is selected
+constexpr float selectThreshold = 0.11;    ///< radius within which a point is selected
 
 bool showPoints = true;               ///< flag which marks if point of cloth are shown or not
 bool showStructuralSprings = true;    ///< flag to show structuralSprings
@@ -370,6 +370,8 @@ void OnIdle() {
  * OpenGL window reshape routine.
  */
 void resize(int w, int h) {
+    WIDTH = w;
+    HEIGHT = h;
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -426,7 +428,7 @@ void mouseMoveHandler(int x, int y) {
             rX += (y - prevY) / 5.0f;
         }
     } else {
-        float delta = 1500 / abs(dist);
+        float delta = 1000 / abs(dist);
         float valX = (x - prevX) / delta;
         float valY = (prevY - y) / delta;
         if (abs(valX) > abs(valY))
