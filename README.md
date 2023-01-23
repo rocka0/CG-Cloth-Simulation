@@ -88,3 +88,6 @@ Applying the Jakobsen method allows us to manage the constraints after the parti
  - Jakobsen Method Paper
  	- http://web.archive.org/web/20080912030612/http://teknikus.dk/tj/gdc2001.htm
 	- https://www.cs.cmu.edu/afs/cs/academic/class/15462-s13/www/lec_slides/Jakobsen.pdf
+
+
+
